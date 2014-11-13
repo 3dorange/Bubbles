@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6bc3633140eafa2498304fe57f88dc54
+guid: 164ce749ac759e84389499eb304c668d
 ModelImporter:
   serializedVersion: 16
   fileIDToRecycleName:
@@ -7,7 +7,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Cylinder001
+    4300000: Plane001
     9500000: //RootNode
   materials:
     importMaterials: 0
@@ -28,7 +28,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: .0299999993
+    globalScale: .0199999996
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 0
@@ -44,7 +44,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 1
   importAnimation: 1
   copyAvatar: 0
