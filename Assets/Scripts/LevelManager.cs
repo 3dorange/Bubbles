@@ -20,6 +20,18 @@ public class LevelManager : MonoBehaviour
 
 	private float LastBubbleGenerateTime = 0;
 
+	public AudioSource MusicSource;
+	public Renderer GranizaRenderer;
+
+	void Awake()
+	{
+		GranizaRenderer.sharedMaterial = StartSceneLogic.GranizaMat;
+		GranizaRenderer.sharedMaterial.mainTexture = StartSceneLogic.GranizaTexture;
+
+		MusicSource.clip = StartSceneLogic.MusicTrack;
+		MusicSource.Play();
+	}
+
 	void Start()
 	{
 		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс

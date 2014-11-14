@@ -21,6 +21,18 @@ public class ObjectPool : MonoBehaviour
 
 	public ObjectType objectType;
 
+	void Awake()
+	{
+		if (objectType == ObjectType.Bubble)
+		{
+			ObjectPrefab = StartSceneLogic.BubblePrefabObject;
+		}
+		else if (objectType == ObjectType.BubbleBoom)
+		{
+			ObjectPrefab = StartSceneLogic.BubbleBoomPrefabObject;
+		}
+	}
+
 	void Start()
 	{
 		CreateObjects();

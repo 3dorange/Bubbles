@@ -8,6 +8,18 @@ public class BubbleBroken : MonoBehaviour
 	private ObjectPool pool;					//пул к которому принадлежит данный объект
 	private float GeneratedTime = 0;			//время генерации
 	private float timeToLive = 1.5f;			//время жизни
+	private AudioSource boomSound;
+
+	void Awake()
+	{
+		boomSound = GetComponent<AudioSource>();
+		boomSound.clip = StartSceneLogic.BoomTrack;
+
+		for (int i = 0; i < Parts.Length;i++)
+		{
+			Parts[i].GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+		}
+	}
 
 	void OnEnable()
 	{
@@ -37,6 +49,7 @@ public class BubbleBroken : MonoBehaviour
 			float power = Random.Range(50,200);
 			Parts[i].rigidbody2D.AddForce(new Vector2(Random.Range(-1,1),Random.Range(0,1)*power));
 		}
+		boomSound.Play();
 	}
 
 	private void ResetParts()

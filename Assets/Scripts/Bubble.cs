@@ -11,6 +11,10 @@ public class Bubble : MonoBehaviour
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
 	private ObjectPool pool;					//пул к которому принадлежит данный объект
 
+	void Awake()
+	{
+		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+	}
 
 	void OnEnable()
 	{
