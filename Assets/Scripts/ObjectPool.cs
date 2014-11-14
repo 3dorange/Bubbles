@@ -9,7 +9,8 @@ public class ObjectPool : MonoBehaviour
 	public List<GameObject> ObjectInPool = new List<GameObject>();				//сами объкты
 	public GameObject ObjectPrefab;												//префаб того, что нужно хранить в пуле
 	public int CurrentActiveNumber = 0;											//Кол-во текущих активных
-	private int curN = 0;
+	private int curN = 0;														//текущий номер
+	private LevelManager levelManager;
 
 	//варианты того, что может быть в пуле
 	public enum ObjectType
@@ -25,6 +26,16 @@ public class ObjectPool : MonoBehaviour
 		CreateObjects();
 	}
 
+	public void SetLevelManager(LevelManager lM)
+	{
+		levelManager = lM;
+	}
+
+	public LevelManager GetLevelManager()
+	{
+		return levelManager;
+	}
+
 	private void CreateObjects()
 	{
 		//генерим объекты для пула
@@ -34,7 +45,7 @@ public class ObjectPool : MonoBehaviour
 			curN++;
 		}
 	}
-
+	
 	private void CreateObject()
 	{
 		//Создаем объект
@@ -50,7 +61,7 @@ public class ObjectPool : MonoBehaviour
 		}
 		else if (objectType == ObjectType.BubbleBoom)
 		{
-
+			newObject.GetComponent<BubbleBroken>().SetPool(this);
 		}
 
 		ObjectInPool.Add(newObject);
@@ -89,13 +100,30 @@ public class ObjectPool : MonoBehaviour
 		return temp;
 	}
 
-	public void Spawn(Vector3 posToSpawn)
+	public void Spawn(Vector3 posToSpawn,Vector3 scaleToUse)
 	{
 		//спавним объект в заданных координатах
 		if (CurrentActiveNumber < ObjectInPool.Count)
 		{
 			GameObject objectToSpawn = GetObjectToSpawn();
 
+			if (objectToSpawn != null)
+			{
+				objectToSpawn.SetActive(true);
+				objectToSpawn.transform.position = posToSpawn;
+				objectToSpawn.transform.localScale = scaleToUse;
+				CurrentActiveNumber++;
+			}
+		}
+	}
+
+	public void Spawn(Vector3 posToSpawn)
+	{
+		//спавним объект в заданных координатах
+		if (CurrentActiveNumber < ObjectInPool.Count)
+		{
+			GameObject objectToSpawn = GetObjectToSpawn();
+			
 			if (objectToSpawn != null)
 			{
 				objectToSpawn.SetActive(true);

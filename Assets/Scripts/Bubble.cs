@@ -6,10 +6,11 @@ public class Bubble : MonoBehaviour
 	//класс отвечающий за поведение шариков
 	private float ScaleFactor = 1;				//множитель размера
 	private int Points = 100;					//кол-во очков за уничтожение шарика
-	private float Speed = 2;					//скорость падения шарика
-	private float MaxSpeed = 10;				//максимально допустимая скорость
+	private float Speed = 0.5f;					//скорость падения шарика
+	private float MaxSpeed = 4;					//максимально допустимая скорость
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
-	public ObjectPool pool;					//пул к которому принадлежит данный объект
+	private ObjectPool pool;					//пул к которому принадлежит данный объект
+
 
 	void OnEnable()
 	{
@@ -24,7 +25,7 @@ public class Bubble : MonoBehaviour
 
 			if (transform.position.y < -4.5f)
 			{
-				DestroyBubble();
+				DestroyBubble(false);
 			}
 		}
 	}
@@ -49,6 +50,7 @@ public class Bubble : MonoBehaviour
 		CanMove = false;
 
 		transform.localScale = new Vector3(1,1,0.99f);
+		transform.GetComponent<SphereCollider>().radius = 0.6f;
 	}
 
 	private void GenerateBubble()
@@ -56,19 +58,30 @@ public class Bubble : MonoBehaviour
 		//функция которая генерит параметры шарика при его создании
 		ResetToDefault();
 
-		ScaleFactor = Random.Range(0.3f,1.0f);
+		ScaleFactor = Random.Range(0.4f,1.0f);
 		Points = (int) (Points/ScaleFactor);
 		Speed = Speed/ScaleFactor;
-		Speed = Mathf.Clamp(Speed,0.1f,MaxSpeed);
+		Speed = Mathf.Clamp(Speed,0.1f,MaxSpeed) + pool.GetLevelManager().DifficultyLevel * 0.1f;
 		CanMove = true;
 
 		transform.localScale = new Vector3(transform.localScale.x*ScaleFactor,transform.localScale.y*ScaleFactor,transform.localScale.z*ScaleFactor);
 	}
 
-	public void DestroyBubble()
+	public void DestroyBubble(bool addPointsOrNot)
 	{
 		//функция уничтожения шарика, которая отключает шар
 		CanMove = false;
+
+		if (addPointsOrNot)
+		{
+			pool.GetLevelManager().AddPoints(Points);
+			pool.GetLevelManager().Bubble_Boom_Pool.Spawn(transform.position,transform.localScale);
+		}
+		else
+		{
+			pool.GetLevelManager().LooseLive();
+		}
+
 		pool.DeSpawn(this.name);
 	}
 }

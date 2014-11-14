@@ -40,7 +40,7 @@ public class InputManager : MonoBehaviour
 		{
 			if (hit.collider.tag == "Bubble")
 			{
-				hit.collider.gameObject.GetComponent<Bubble>().DestroyBubble();
+				hit.collider.gameObject.GetComponent<Bubble>().DestroyBubble(true);
 			}
 		}
 	}

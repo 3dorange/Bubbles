@@ -7,33 +7,164 @@ public class LevelManager : MonoBehaviour
 	public ObjectPool Bubbles_Pool;							//пул шаров, для генераци
 	public ObjectPool Bubble_Boom_Pool;						//пул сломанных шаров
 	public InputManager inputManager;						//мeнеджер ввода
-	public GUIManager guiManaher;							//менеджер интерфейса
+	public GUIManager guiManager;							//менеджер интерфейса
 
-	public int PointsEarned = 0;
+	private int PointsEarned = 0;
+	private int PlayerLives = 10;
+
+	private bool GameStarted = false;
+
+	public int DifficultyLevel = 0;								//уровень сложности игры
+	private float TimeToWaitForNextBubble = 0;						//время между появлением следующего шарика
+	private int BubblesToGenerateInWave = 0;						//кол-во шариков в волне
+
+	private float LastBubbleGenerateTime = 0;
 
 	void Start()
 	{
 		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
-		GameStarted();
+		Bubbles_Pool.SetLevelManager(this);
+
+		ResetGame();
+		StartGame();
+	}
+
+	void Update()
+	{
+		if (GameStarted)
+		{
+			if (BubblesToGenerateInWave > 0)
+			{
+				if (Time.time - LastBubbleGenerateTime > TimeToWaitForNextBubble)
+				{
+					GenerateBubble();
+				}
+			}
+			else
+			{
+				NextWave();
+			}
+		}
+	}
+
+	private void NextWave()
+	{
+		//меняем уровень сложности
+		DifficultyLevel++;
+
+		if (DifficultyLevel >= 8)
+		{
+			Win();
+			return;
+		}
+		else
+		{
+			guiManager.ActivatePlayerLevelChange(DifficultyLevel);
+			SetDifficulty();
+		}
+	}
+
+	private void Win()
+	{
+		// все уровни успешно пройдены
+	}
+
+	private void GameOver()
+	{
+		// жизни закончились
+	}
+
+	private void GenerateBubble()
+	{
+		//спавним шарик из пула
+		//обновляем время последней генерации шарика
+		//уменьшаем оставшееся кол-во шариков для генеарции в текущей волне
+		Bubbles_Pool.Spawn(new Vector3(Random.Range(-6,-0.7f),Random.Range(6,8.0f),0));
+		LastBubbleGenerateTime = Time.time;
+		BubblesToGenerateInWave--;
+	}
+
+	private void SetDifficulty()
+	{
+		//устанавливаем параметры генерации шариков в зависимости от сложности игры
+		switch (DifficultyLevel)
+		{
+			case 0:
+				TimeToWaitForNextBubble = 0.9f;
+				BubblesToGenerateInWave = 5;
+				break;
+			case 1:
+				TimeToWaitForNextBubble = 0.8f;
+				BubblesToGenerateInWave = 10;
+				break;
+			case 2:
+				TimeToWaitForNextBubble = 0.7f;
+				BubblesToGenerateInWave = 20;
+				break;
+			case 3:
+				TimeToWaitForNextBubble = 0.6f;
+				BubblesToGenerateInWave = 30;
+				break;
+			case 4:
+				TimeToWaitForNextBubble = 0.4f;
+				BubblesToGenerateInWave = 40;
+				break;
+			case 5:
+				TimeToWaitForNextBubble = 0.3f;
+				BubblesToGenerateInWave = 40;
+				break;
+			case 6:
+				TimeToWaitForNextBubble = 0.3f;
+				BubblesToGenerateInWave = 50;
+				break;
+			case 7:
+				TimeToWaitForNextBubble = 0.2f;
+				BubblesToGenerateInWave = 60;
+				break;
+
+			default:
+				TimeToWaitForNextBubble = 0.5f;
+				BubblesToGenerateInWave = 5;
+				break;
+		}		
+	}
+
+	private void ResetGame()
+	{
+		//обнуляем параметры игры
+		UpdatePlayerScore();
+		UpdatePlayerLive();
 	}
 
 	public void AddPoints(int points)
 	{
 		PointsEarned +=points;					//добавляем очки за шар, к уже заработанным
+		UpdatePlayerScore();
+	}
+
+	public void LooseLive()
+	{
+		//вычитаем 1 жизнь
+		PlayerLives--;
+		UpdatePlayerLive();
+	}
+
+	private void UpdatePlayerLive()
+	{
+		//обновляем кол-во очков игрока в интерфейсе
+		guiManager.PlayerLives.text = "Lives : " + PlayerLives;
 	}
 
 	private void UpdatePlayerScore()
 	{
 		//обновляем кол-во очков игрока в интерфейсе
-		guiManaher.PlayerScore.text = "Score : " + PointsEarned;
+		guiManager.PlayerScore.text = "Score : " + PointsEarned;
 	}
 
-	private void GameStarted()
+	private void StartGame()
 	{
 		//Игра началась
-		for (int i = 0; i < 10;i++)
-		{
-			Bubbles_Pool.Spawn(new Vector3(Random.Range(-6,-0.3f),Random.Range(6,8.0f),0));
-		}
+		GameStarted = true;
+		SetDifficulty();
 	}
 }
