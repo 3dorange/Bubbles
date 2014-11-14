@@ -7,7 +7,7 @@ public class ObjectPool : MonoBehaviour
 	//Класс для создания пула какиз-либо объектов
 	public int ObjectNumber = 50;												// кол-во объектов в пуле
 	public List<GameObject> ObjectInPool = new List<GameObject>();				//сами объкты
-	public GameObject ObjectPrefab;												//префаб того, что нужно хранить в пуле
+	public List<GameObject> ObjectPrefab;												//префаб того, что нужно хранить в пуле
 	public int CurrentActiveNumber = 0;											//Кол-во текущих активных
 	private int curN = 0;														//текущий номер
 	private LevelManager levelManager;
@@ -25,11 +25,17 @@ public class ObjectPool : MonoBehaviour
 	{
 		if (objectType == ObjectType.Bubble)
 		{
-			ObjectPrefab = StartSceneLogic.BubblePrefabObject;
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject1);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject2);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject3);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject4);
 		}
 		else if (objectType == ObjectType.BubbleBoom)
 		{
-			ObjectPrefab = StartSceneLogic.BubbleBoomPrefabObject;
+			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject1);
+			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject2);
+			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject3);
+			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject4);
 		}
 	}
 
@@ -63,9 +69,10 @@ public class ObjectPool : MonoBehaviour
 		//Создаем объект
 		//делаем его child-ом нашего пула
 		//добавляем в список объектов пула и делаем неактивным
-		GameObject newObject = Instantiate(ObjectPrefab,new Vector3(500,500,0),ObjectPrefab.transform.rotation) as GameObject;
+		int randomN = Random.Range(0,ObjectPrefab.Count);
+		GameObject newObject = Instantiate(ObjectPrefab[randomN],new Vector3(500,500,0),ObjectPrefab[randomN].transform.rotation) as GameObject;
 		newObject.transform.parent = this.transform;
-		newObject.name = ObjectPrefab.name + "_" + curN;
+		newObject.name = ObjectPrefab[randomN].name + "_" + curN;
 
 		if (objectType == ObjectType.Bubble)
 		{
@@ -112,7 +119,7 @@ public class ObjectPool : MonoBehaviour
 		return temp;
 	}
 
-	public void Spawn(Vector3 posToSpawn,Vector3 scaleToUse)
+	public void Spawn(Vector3 posToSpawn,Vector3 scaleToUse,Quaternion rot)
 	{
 		//спавним объект в заданных координатах
 		if (CurrentActiveNumber < ObjectInPool.Count)
@@ -123,6 +130,7 @@ public class ObjectPool : MonoBehaviour
 			{
 				objectToSpawn.SetActive(true);
 				objectToSpawn.transform.position = posToSpawn;
+				objectToSpawn.transform.rotation = rot;
 				objectToSpawn.transform.localScale = scaleToUse;
 				CurrentActiveNumber++;
 			}

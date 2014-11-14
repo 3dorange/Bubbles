@@ -5,8 +5,15 @@ using System;
 public class StartSceneLogic : MonoBehaviour 
 {
 	//Логики закрузки игры
-	public static GameObject BubblePrefabObject;				//префаб шарика
-	public static GameObject BubbleBoomPrefabObject;			//префаб поломанного шарика
+	public static GameObject BubblePrefabObject1;				//префаб шарика
+	public static GameObject BubblePrefabObject2;				//префаб шарика
+	public static GameObject BubblePrefabObject3;				//префаб шарика
+	public static GameObject BubblePrefabObject4;				//префаб шарика
+
+	public static GameObject BubbleBoomPrefabObject1;			//префаб поломанного шарика
+	public static GameObject BubbleBoomPrefabObject2;			//префаб поломанного шарика
+	public static GameObject BubbleBoomPrefabObject3;			//префаб поломанного шарика
+	public static GameObject BubbleBoomPrefabObject4;			//префаб поломанного шарика
 
 	public static Texture GranizaTexture;						//текстура границы посередине
 
@@ -37,13 +44,37 @@ public class StartSceneLogic : MonoBehaviour
 			AssetBundle newBundle = www.assetBundle;
 
 			//выгружаем нужные нам ассеты
-			AssetBundleRequest request = newBundle.LoadAsync("Bubble", typeof(GameObject));
+			AssetBundleRequest request = newBundle.LoadAsync("Bubble_1", typeof(GameObject));
 			yield return request;
-			BubblePrefabObject = request.asset as GameObject;
+			BubblePrefabObject1 = request.asset as GameObject;
 
-			request = newBundle.LoadAsync("Bubble_Broken", typeof(GameObject));
+			request = newBundle.LoadAsync("Bubble_2", typeof(GameObject));
 			yield return request;
-			BubbleBoomPrefabObject = request.asset as GameObject;
+			BubblePrefabObject2 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_3", typeof(GameObject));
+			yield return request;
+			BubblePrefabObject3 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_4", typeof(GameObject));
+			yield return request;
+			BubblePrefabObject4 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_Broken_1", typeof(GameObject));
+			yield return request;
+			BubbleBoomPrefabObject1 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_Broken_2", typeof(GameObject));
+			yield return request;
+			BubbleBoomPrefabObject2 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_Broken_3", typeof(GameObject));
+			yield return request;
+			BubbleBoomPrefabObject3 = request.asset as GameObject;
+
+			request = newBundle.LoadAsync("Bubble_Broken_4", typeof(GameObject));
+			yield return request;
+			BubbleBoomPrefabObject4 = request.asset as GameObject;
 
 			request = newBundle.LoadAsync("graniza", typeof(Texture));
 			yield return request;

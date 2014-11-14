@@ -18,10 +18,12 @@ public class LevelManager : MonoBehaviour
 	private float TimeToWaitForNextBubble = 0;						//время между появлением следующего шарика
 	private int BubblesToGenerateInWave = 0;						//кол-во шариков в волне
 
+	public int ActiveBubbles = 0;									//кол-во шариков на экране в данный момент
 	private float LastBubbleGenerateTime = 0;
 
 	public AudioSource MusicSource;
 	public Renderer GranizaRenderer;
+	public TextureManager textureManager;	
 
 	void Awake()
 	{
@@ -54,7 +56,10 @@ public class LevelManager : MonoBehaviour
 			}
 			else
 			{
-				NextWave();
+				if (ActiveBubbles <= 0)
+				{
+					NextWave();
+				}
 			}
 		}
 	}
@@ -72,6 +77,7 @@ public class LevelManager : MonoBehaviour
 		else
 		{
 			guiManager.ActivatePlayerLevelChange(DifficultyLevel);
+			textureManager.CreateTexture(DifficultyLevel);
 			SetDifficulty();
 		}
 	}
@@ -94,6 +100,7 @@ public class LevelManager : MonoBehaviour
 		Bubbles_Pool.Spawn(new Vector3(Random.Range(-6,-0.7f),Random.Range(6,8.0f),0));
 		LastBubbleGenerateTime = Time.time;
 		BubblesToGenerateInWave--;
+		ActiveBubbles++;
 	}
 
 	private void SetDifficulty()

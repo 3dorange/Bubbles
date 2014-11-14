@@ -9,7 +9,7 @@ public class Bubble : MonoBehaviour
 	private float Speed = 0.5f;					//скорость падения шарика
 	private float MaxSpeed = 4;					//максимально допустимая скорость
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
-	private ObjectPool pool;					//пул к которому принадлежит данный объект
+	public ObjectPool pool;					//пул к которому принадлежит данный объект
 
 	void Awake()
 	{
@@ -62,6 +62,10 @@ public class Bubble : MonoBehaviour
 		//функция которая генерит параметры шарика при его создании
 		ResetToDefault();
 
+		GetComponent<MeshRenderer>().sharedMaterial.mainTexture = pool.GetLevelManager().textureManager.GetCurrentTexture();
+
+		transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;
+
 		ScaleFactor = Random.Range(0.4f,1.0f);
 		Points = (int) (Points/ScaleFactor);
 		Speed = Speed/ScaleFactor;
@@ -79,13 +83,13 @@ public class Bubble : MonoBehaviour
 		if (addPointsOrNot)
 		{
 			pool.GetLevelManager().AddPoints(Points);
-			pool.GetLevelManager().Bubble_Boom_Pool.Spawn(transform.position,transform.localScale);
+			pool.GetLevelManager().Bubble_Boom_Pool.Spawn(transform.position,transform.localScale,transform.localRotation);
 		}
 		else
 		{
 			pool.GetLevelManager().LooseLive();
 		}
-
+		pool.GetLevelManager().ActiveBubbles--;
 		pool.DeSpawn(this.name);
 	}
 }
