@@ -18,6 +18,7 @@ public class StartSceneLogic : MonoBehaviour
 	public static Texture GranizaTexture;						//текстура границы посередине
 
 	public static Material Diskmat;								//материал шаров
+	public static Material Diskmat_Old;							//материал шаров пред. уровня
 	public static Material GranizaMat;							//материал границы посередине
 
 	public static AudioClip MusicTrack;							//музыка
@@ -83,6 +84,10 @@ public class StartSceneLogic : MonoBehaviour
 			request = newBundle.LoadAsync("Disk", typeof(Material));
 			yield return request;
 			Diskmat = request.asset as Material;
+
+			request = newBundle.LoadAsync("Disk_Old", typeof(Material));
+			yield return request;
+			Diskmat_Old = request.asset as Material;
 
 			request = newBundle.LoadAsync("Graniza", typeof(Material));
 			yield return request;

@@ -10,14 +10,21 @@ public class Bubble : MonoBehaviour
 	private float MaxSpeed = 4;					//максимально допустимая скорость
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
 	public ObjectPool pool;					//пул к которому принадлежит данный объект
+	private int WaveGenerated = 0;				//в какой волне был создан
 
 	void Awake()
 	{
-		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+//		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
 	}
 
 	void OnEnable()
 	{
+		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+
+		if (pool)
+		{
+			CheckMaterial();
+		}
 		GenerateBubble();
 	}
 
@@ -55,14 +62,34 @@ public class Bubble : MonoBehaviour
 
 		transform.localScale = new Vector3(1,1,0.99f);
 		transform.GetComponent<SphereCollider>().radius = 0.6f;
+
+		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+	}
+
+	public void SetWave(int num)
+	{
+		WaveGenerated = num;
+	}
+	
+	public void CheckMaterial()
+	{
+		//проверяем какой материал использовать
+		if (pool.GetLevelManager().DifficultyLevel != WaveGenerated)
+		{
+			GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat_Old;
+		}
+		else
+		{
+			GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+		}
 	}
 
 	private void GenerateBubble()
 	{
 		//функция которая генерит параметры шарика при его создании
 		ResetToDefault();
-
-		GetComponent<MeshRenderer>().sharedMaterial.mainTexture = pool.GetLevelManager().textureManager.GetCurrentTexture();
+//		CheckMaterial();
+//		GetComponent<MeshRenderer>().sharedMaterial.mainTexture = pool.GetLevelManager().textureManager.GetCurrentTexture();
 
 		transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;
 
@@ -73,6 +100,8 @@ public class Bubble : MonoBehaviour
 		CanMove = true;
 
 		transform.localScale = new Vector3(transform.localScale.x*ScaleFactor,transform.localScale.y*ScaleFactor,transform.localScale.z*ScaleFactor);
+
+		pool.GetLevelManager().GetBubblesOnStage().Add(this);
 	}
 
 	public void DestroyBubble(bool addPointsOrNot)
@@ -90,6 +119,8 @@ public class Bubble : MonoBehaviour
 			pool.GetLevelManager().LooseLive();
 		}
 		pool.GetLevelManager().ActiveBubbles--;
+		pool.GetLevelManager().CheckForNextWave();
+		pool.GetLevelManager().GetBubblesOnStage().Remove(this);
 		pool.DeSpawn(this.name);
 	}
 }

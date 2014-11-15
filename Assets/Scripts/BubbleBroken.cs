@@ -10,6 +10,8 @@ public class BubbleBroken : MonoBehaviour
 	private float timeToLive = 1.5f;			//время жизни
 	private AudioSource boomSound;
 
+	private int WaveGenerated = 0;				//в какой волне был создан
+
 	void Awake()
 	{
 		boomSound = GetComponent<AudioSource>();
@@ -25,6 +27,7 @@ public class BubbleBroken : MonoBehaviour
 	{
 		GeneratedTime = Time.time;
 		ResetParts();
+
 		Boom();
 	}
 
@@ -41,12 +44,46 @@ public class BubbleBroken : MonoBehaviour
 		pool = p;
 	}
 
+	public void SetWave(int num)
+	{
+		WaveGenerated = num;
+		CheckMaterial();
+	}
+
+	public void CheckMaterial()
+	{
+		//проверяем какой материал использовать
+//		Debug.Log(pool.GetLevelManager().DifficultyLevel + " " + WaveGenerated );
+
+		if (pool.GetLevelManager().DifficultyLevel != WaveGenerated)
+		{
+			for (int i = 0; i < Parts.Length;i++)
+			{
+//				Debug.Log("dgdgdgdgd");
+				Parts[i].GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat_Old;
+//				StartSceneLogic.Diskmat_Old.mainTexture = pool.GetLevelManager().textureManager.GetOldTexture();
+			}
+		}
+		else
+		{
+			for (int i = 0; i < Parts.Length;i++)
+			{
+				Parts[i].GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
+			}
+		}
+	}
+
 	private void Boom()
 	{
 		//разрываем шарик на куски, летящие в рандомные направления
+		if (pool)
+		{
+			pool.GetLevelManager().GetBubbleBoomsOnStage().Add(this);
+		}
+
 		for (int i = 0; i < Parts.Length;i++)
 		{
-			float power = Random.Range(50,200);
+			float power = Random.Range(100,400);
 			Parts[i].rigidbody2D.AddForce(new Vector2(Random.Range(-1,1),Random.Range(0,1)*power));
 		}
 		boomSound.Play();
@@ -65,6 +102,7 @@ public class BubbleBroken : MonoBehaviour
 
 	public void DestroyBubbleBoom()
 	{
+		pool.GetLevelManager().GetBubbleBoomsOnStage().Remove(this);
 		pool.DeSpawn(this.name);
 	}
 }

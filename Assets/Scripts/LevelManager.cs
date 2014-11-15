@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviour 
 {
@@ -14,7 +15,7 @@ public class LevelManager : MonoBehaviour
 
 	private bool GameStarted = false;
 
-	public int DifficultyLevel = 0;								//уровень сложности игры
+	public int DifficultyLevel = 0;									//уровень сложности игры
 	private float TimeToWaitForNextBubble = 0;						//время между появлением следующего шарика
 	private int BubblesToGenerateInWave = 0;						//кол-во шариков в волне
 
@@ -25,8 +26,17 @@ public class LevelManager : MonoBehaviour
 	public Renderer GranizaRenderer;
 	public TextureManager textureManager;	
 
+	private List<Bubble> BubblesOnStage = new List<Bubble>();						//список шариков на экране
+	public List<BubbleBroken> BubbleBoomsOnStage = new List<BubbleBroken>();		//список сломанных шариков на экране
+
+//	private bool NextWaveStarted = false;
+
 	void Awake()
 	{
+		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
+		Bubbles_Pool.SetLevelManager(this);
+		Bubble_Boom_Pool.SetLevelManager(this);
+
 		GranizaRenderer.sharedMaterial = StartSceneLogic.GranizaMat;
 		GranizaRenderer.sharedMaterial.mainTexture = StartSceneLogic.GranizaTexture;
 
@@ -36,9 +46,6 @@ public class LevelManager : MonoBehaviour
 
 	void Start()
 	{
-		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
-		Bubbles_Pool.SetLevelManager(this);
-
 		ResetGame();
 		StartGame();
 	}
@@ -56,11 +63,20 @@ public class LevelManager : MonoBehaviour
 			}
 			else
 			{
-				if (ActiveBubbles <= 0)
-				{
-					NextWave();
-				}
+//				if (ActiveBubbles <= 0 && !NextWaveStarted)
+//				{
+//					NextWave();
+//				}
 			}
+		}
+	}
+
+	public void CheckForNextWave()
+	{
+		if (ActiveBubbles <= 0)
+		{
+//			Debug.Log("CheckForNextWave");
+			NextWave();
 		}
 	}
 
@@ -68,6 +84,7 @@ public class LevelManager : MonoBehaviour
 	{
 		//меняем уровень сложности
 		DifficultyLevel++;
+//		NextWaveStarted = true;
 
 		if (DifficultyLevel >= 8)
 		{
@@ -77,8 +94,23 @@ public class LevelManager : MonoBehaviour
 		else
 		{
 			guiManager.ActivatePlayerLevelChange(DifficultyLevel);
-			textureManager.CreateTexture(DifficultyLevel);
+			textureManager.UpdateTextures(DifficultyLevel);
 			SetDifficulty();
+			UpdateMaterials();
+		}
+	}
+
+	private void UpdateMaterials()
+	{
+		// обновляем материалы, так чтобы они соотвествовали новым текстурам
+		for (int i = 0;i < BubblesOnStage.Count;i++)
+		{
+			BubblesOnStage[i].CheckMaterial();
+		}
+
+		for (int i = 0;i < BubbleBoomsOnStage.Count;i++)
+		{
+			BubbleBoomsOnStage[i].CheckMaterial();
 		}
 	}
 
@@ -172,6 +204,16 @@ public class LevelManager : MonoBehaviour
 	{
 		//обновляем кол-во очков игрока в интерфейсе
 		guiManager.PlayerLives.text = "Lives : " + PlayerLives;
+	}
+
+	public List<Bubble> GetBubblesOnStage()
+	{
+		return BubblesOnStage;
+	}
+	
+	public List<BubbleBroken> GetBubbleBoomsOnStage()
+	{
+		return BubbleBoomsOnStage;
 	}
 
 	private void UpdatePlayerScore()

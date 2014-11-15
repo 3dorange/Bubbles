@@ -132,6 +132,7 @@ public class ObjectPool : MonoBehaviour
 				objectToSpawn.transform.position = posToSpawn;
 				objectToSpawn.transform.rotation = rot;
 				objectToSpawn.transform.localScale = scaleToUse;
+				objectToSpawn.GetComponent<BubbleBroken>().SetWave(levelManager.DifficultyLevel);
 				CurrentActiveNumber++;
 			}
 		}
@@ -148,6 +149,7 @@ public class ObjectPool : MonoBehaviour
 			{
 				objectToSpawn.SetActive(true);
 				objectToSpawn.transform.position = posToSpawn;
+				objectToSpawn.GetComponent<Bubble>().SetWave(levelManager.DifficultyLevel);
 				CurrentActiveNumber++;
 			}
 		}

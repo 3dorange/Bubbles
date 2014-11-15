@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class TextureManager : MonoBehaviour 
 {
 	//класс отвечающий за генерацию и удаление неиспользуемых текстур для шариков
 	public Texture2D CurrentTexture = null;					//текущая активная текстура
-	private Texture2D NextTexture = null;					//следующая текстура
+	public Texture2D OldTexture = null;					//следующая текстура
 
 	public Color[] ColorSet1;
 	public Color[] ColorSet2;
@@ -20,7 +21,10 @@ public class TextureManager : MonoBehaviour
 
 	void Awake()
 	{
-		CreateTexture(0);
+		CurrentTexture = CreateTexture(0);
+
+		StartSceneLogic.Diskmat.mainTexture = CurrentTexture;
+		StartSceneLogic.Diskmat_Old.mainTexture = OldTexture;
 	}
 
 	public Texture2D GetCurrentTexture()
@@ -28,16 +32,31 @@ public class TextureManager : MonoBehaviour
 		return CurrentTexture;
 	}
 
-	public void CreateTexture(int levelNumber)
+	public Texture2D GetOldTexture()
 	{
-		Texture2D tempTexture;
-		Color32 tempColor;
+		return OldTexture;
+	}
+
+	public void UpdateTextures(int levelNumber)
+	{
+		Debug.Log("UpdateTextures");
+		OldTexture = CurrentTexture;
+		CurrentTexture = CreateTexture(levelNumber);
+
+		StartSceneLogic.Diskmat.mainTexture = CurrentTexture;
+		StartSceneLogic.Diskmat_Old.mainTexture = OldTexture;
+	}
+
+	private Texture2D CreateTexture(int levelNumber)
+	{
+		Texture2D tempTexture = null;
 		CurrentLevel = levelNumber;
 
 		tempTexture = GenerateTextureAtlas(128);
-		CurrentTexture = tempTexture;
 
 		Resources.UnloadUnusedAssets();
+
+		return	tempTexture;
 	}
 
 	private Color32 GetColor(int x,int y, int size)
