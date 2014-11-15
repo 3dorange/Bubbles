@@ -34,6 +34,7 @@ public class LevelManager : MonoBehaviour
 		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
 		Bubbles_Pool.SetLevelManager(this);
 		Bubble_Boom_Pool.SetLevelManager(this);
+		guiManager.SetLevelManager(this);
 
 		GranizaRenderer.sharedMaterial = StartSceneLogic.GranizaMat;
 		GranizaRenderer.sharedMaterial.mainTexture = StartSceneLogic.GranizaTexture;
@@ -45,7 +46,7 @@ public class LevelManager : MonoBehaviour
 	void Start()
 	{
 		ResetGame();
-		StartGame();
+//		StartGame();
 	}
 
 	void Update()
@@ -211,7 +212,7 @@ public class LevelManager : MonoBehaviour
 		guiManager.PlayerScore.text = "Score : " + PointsEarned;
 	}
 
-	private void StartGame()
+	public void StartGame()
 	{
 		//Игра началась
 		GameStarted = true;
