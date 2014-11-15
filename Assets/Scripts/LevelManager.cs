@@ -29,8 +29,6 @@ public class LevelManager : MonoBehaviour
 	private List<Bubble> BubblesOnStage = new List<Bubble>();						//список шариков на экране
 	public List<BubbleBroken> BubbleBoomsOnStage = new List<BubbleBroken>();		//список сломанных шариков на экране
 
-//	private bool NextWaveStarted = false;
-
 	void Awake()
 	{
 		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
@@ -61,13 +59,6 @@ public class LevelManager : MonoBehaviour
 					GenerateBubble();
 				}
 			}
-			else
-			{
-//				if (ActiveBubbles <= 0 && !NextWaveStarted)
-//				{
-//					NextWave();
-//				}
-			}
 		}
 	}
 
@@ -75,7 +66,6 @@ public class LevelManager : MonoBehaviour
 	{
 		if (ActiveBubbles <= 0)
 		{
-//			Debug.Log("CheckForNextWave");
 			NextWave();
 		}
 	}
@@ -84,7 +74,6 @@ public class LevelManager : MonoBehaviour
 	{
 		//меняем уровень сложности
 		DifficultyLevel++;
-//		NextWaveStarted = true;
 
 		if (DifficultyLevel >= 8)
 		{

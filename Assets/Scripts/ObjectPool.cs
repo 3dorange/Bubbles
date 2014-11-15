@@ -23,6 +23,7 @@ public class ObjectPool : MonoBehaviour
 
 	void Awake()
 	{
+		//добавляем вариенты префабов для генерации
 		if (objectType == ObjectType.Bubble)
 		{
 			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject1);

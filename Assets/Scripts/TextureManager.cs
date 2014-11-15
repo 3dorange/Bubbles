@@ -39,7 +39,7 @@ public class TextureManager : MonoBehaviour
 
 	public void UpdateTextures(int levelNumber)
 	{
-		Debug.Log("UpdateTextures");
+		//обновляем текстуры у материалов
 		OldTexture = CurrentTexture;
 		CurrentTexture = CreateTexture(levelNumber);
 
@@ -54,6 +54,7 @@ public class TextureManager : MonoBehaviour
 
 		tempTexture = GenerateTextureAtlas(128);
 
+		//выгружаем неиспользуемые текстуры
 		Resources.UnloadUnusedAssets();
 
 		return	tempTexture;

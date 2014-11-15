@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Bubble : MonoBehaviour 
+public class Bubble : BubbleParent 
 {
 	//класс отвечающий за поведение шариков
 	private float ScaleFactor = 1;				//множитель размера
@@ -9,13 +9,7 @@ public class Bubble : MonoBehaviour
 	private float Speed = 0.5f;					//скорость падения шарика
 	private float MaxSpeed = 4;					//максимально допустимая скорость
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
-	public ObjectPool pool;					//пул к которому принадлежит данный объект
-	private int WaveGenerated = 0;				//в какой волне был создан
 
-	void Awake()
-	{
-//		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
-	}
 
 	void OnEnable()
 	{
@@ -41,11 +35,6 @@ public class Bubble : MonoBehaviour
 		}
 	}
 
-	public void SetPool(ObjectPool p)
-	{
-		pool = p;
-	}
-
 	private void MoveBubble()
 	{
 		float PosY = transform.position.y - Speed*Time.deltaTime;
@@ -65,13 +54,8 @@ public class Bubble : MonoBehaviour
 
 		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
 	}
-
-	public void SetWave(int num)
-	{
-		WaveGenerated = num;
-	}
 	
-	public void CheckMaterial()
+	override public void CheckMaterial()
 	{
 		//проверяем какой материал использовать
 		if (pool.GetLevelManager().DifficultyLevel != WaveGenerated)
@@ -88,8 +72,6 @@ public class Bubble : MonoBehaviour
 	{
 		//функция которая генерит параметры шарика при его создании
 		ResetToDefault();
-//		CheckMaterial();
-//		GetComponent<MeshRenderer>().sharedMaterial.mainTexture = pool.GetLevelManager().textureManager.GetCurrentTexture();
 
 		transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;
 

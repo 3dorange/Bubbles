@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BubbleBroken : MonoBehaviour 
+public class BubbleBroken : BubbleParent 
 {
 	//Класс отвечающий за разламывание шариков
 	public GameObject[] Parts;					//кусочки шарика
-	private ObjectPool pool;					//пул к которому принадлежит данный объект
+
 	private float GeneratedTime = 0;			//время генерации
 	private float timeToLive = 1.5f;			//время жизни
 	private AudioSource boomSound;
-
-	private int WaveGenerated = 0;				//в какой волне был создан
 
 	void Awake()
 	{
@@ -39,29 +37,14 @@ public class BubbleBroken : MonoBehaviour
 		}
 	}
 
-	public void SetPool(ObjectPool p)
-	{
-		pool = p;
-	}
-
-	public void SetWave(int num)
-	{
-		WaveGenerated = num;
-		CheckMaterial();
-	}
-
-	public void CheckMaterial()
+	override public void CheckMaterial()
 	{
 		//проверяем какой материал использовать
-//		Debug.Log(pool.GetLevelManager().DifficultyLevel + " " + WaveGenerated );
-
 		if (pool.GetLevelManager().DifficultyLevel != WaveGenerated)
 		{
 			for (int i = 0; i < Parts.Length;i++)
 			{
-//				Debug.Log("dgdgdgdgd");
 				Parts[i].GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat_Old;
-//				StartSceneLogic.Diskmat_Old.mainTexture = pool.GetLevelManager().textureManager.GetOldTexture();
 			}
 		}
 		else
