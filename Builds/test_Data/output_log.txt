@@ -1,4 +1,4 @@
-Initialize engine version: 4.3.2f1 (0517a5ae8669)
+Initialize engine version: 4.5.0f6 (fd4616464986)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 9.0c [nvd3dum.dll 9.18.13.4448]
@@ -11,7 +11,23 @@ Platform assembly: G:\Unity3d_projects\Bubbles_Test\Bubbles\Builds\test_Data\Man
 Loading G:\Unity3d_projects\Bubbles_Test\Bubbles\Builds\test_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: G:\Unity3d_projects\Bubbles_Test\Bubbles\Builds\test_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading G:\Unity3d_projects\Bubbles_Test\Bubbles\Builds\test_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.051 seconds
+- Completed reload, in  0.042 seconds
 desktop: 1920x1080 60Hz; virtual: 3840x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
+Platform assembly: G:\Unity3d_projects\Bubbles_Test\Bubbles\Builds\test_Data\Managed\System.dll (this message is harmless)
+UnloadTime: 0.230223 ms
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 3 unused Assets to reduce memory usage. Loaded Objects now: 596.
+Total: 0.567303 ms (FindLiveObjects: 0.017109 ms CreateObjectMapping: 0.009004 ms MarkObjects: 0.215515 ms  DeleteObjects: 0.008404 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 0 unused Assets to reduce memory usage. Loaded Objects now: 596.
+Total: 0.613227 ms (FindLiveObjects: 0.032117 ms CreateObjectMapping: 0.018009 ms MarkObjects: 0.258137 ms  DeleteObjects: 0.003301 ms)
+
+SendCommand
+ 
+(Filename: C:/BuildAgent/work/aeedb04a1292f85a/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 49)
+

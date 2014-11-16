@@ -23,7 +23,10 @@ public class GUIManager : MonoBehaviour
 	private string EnemysName = "";
 
 	private LevelManager levelManager;			//основной класс логики
-	
+
+	public UILabel IP_Label;
+	public UILabel Port_Label;
+
 	public void SetLevelManager(LevelManager levM)
 	{
 		levelManager = levM;
@@ -73,6 +76,30 @@ public class GUIManager : MonoBehaviour
 		PlayerName = name;
 	}
 
+	public void ServerPressed()
+	{
+		//в интерфейсе была нажата кнопка коннекта как сервер
+		string ipAdress = IP_Label.text;
+		string port = Port_Label.text;
+
+		levelManager.networkManager.ConnectAsServerPressed(ipAdress,port);
+
+		NGUITools.SetActive(NetworkParametersPanel,false);
+		NGUITools.SetActive(EnterNamePanel,true);
+	}
+
+	public void ClientPressed()
+	{
+		//в интерфейсе была нажата кнопка коннекта как клиент
+		string ipAdress = IP_Label.text;
+		string port = Port_Label.text;
+		
+		levelManager.networkManager.ConnectAsClientPressed(ipAdress,port);
+		
+		NGUITools.SetActive(NetworkParametersPanel,false);
+		NGUITools.SetActive(EnterNamePanel,true);
+	}
+
 	public void StartPressed()
 	{
 		//Нажата кнопка старта игры в панели введения имени
@@ -84,6 +111,8 @@ public class GUIManager : MonoBehaviour
 		}
 
 		UpdatePlayerName();
+		levelManager.networkManager.SendPlayerName(PlayerName);
+
 		levelManager.StartGame();
 	}
 }

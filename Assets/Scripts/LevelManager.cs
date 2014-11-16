@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
 	public ObjectPool Bubble_Boom_Pool;						//пул сломанных шаров
 	public InputManager inputManager;						//мeнеджер ввода
 	public GUIManager guiManager;							//менеджер интерфейса
+	public NetworkManager networkManager;					//менеджер мультиплеера
 
 	private int PointsEarned = 0;
 	private int PlayerLives = 10;
@@ -35,6 +36,7 @@ public class LevelManager : MonoBehaviour
 		Bubbles_Pool.SetLevelManager(this);
 		Bubble_Boom_Pool.SetLevelManager(this);
 		guiManager.SetLevelManager(this);
+		networkManager.SetLevelManager(this);
 
 		GranizaRenderer.sharedMaterial = StartSceneLogic.GranizaMat;
 		GranizaRenderer.sharedMaterial.mainTexture = StartSceneLogic.GranizaTexture;
