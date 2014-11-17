@@ -7,6 +7,7 @@ public class LevelManager : MonoBehaviour
 	//Скрипт отвечающий за общуюю логику игровой сцены
 	public ObjectPool Bubbles_Pool;							//пул шаров, для генераци
 	public ObjectPool Bubble_Boom_Pool;						//пул сломанных шаров
+	public ObjectPool Other_Bubbles_Pool;							//пул шаров, для генераци
 	public InputManager inputManager;						//мeнеджер ввода
 	public GUIManager guiManager;							//менеджер интерфейса
 	public NetworkManager networkManager;					//менеджер мультиплеера
@@ -29,6 +30,10 @@ public class LevelManager : MonoBehaviour
 
 	private List<Bubble> BubblesOnStage = new List<Bubble>();						//список шариков на экране
 	public List<BubbleBroken> BubbleBoomsOnStage = new List<BubbleBroken>();		//список сломанных шариков на экране
+
+	//network
+	private bool StartPressed = false;
+	private bool OtherIsReady = false;
 
 	void Awake()
 	{
@@ -64,6 +69,33 @@ public class LevelManager : MonoBehaviour
 			}
 		}
 	}
+
+	//
+	public void OtherIsReadyRecieved()
+	{
+		OtherIsReady = true;
+
+		if (StartPressed)
+		{
+			StartGame();
+		}
+	}
+
+	public bool GetOtherIsReady()
+	{
+		return OtherIsReady;
+	}
+
+	public void StartButtonPressed()
+	{
+		StartPressed = true;
+		
+		if (OtherIsReady)
+		{
+			StartGame();
+		}
+	}
+	//
 
 	public void CheckForNextWave()
 	{
@@ -125,6 +157,13 @@ public class LevelManager : MonoBehaviour
 		LastBubbleGenerateTime = Time.time;
 		BubblesToGenerateInWave--;
 		ActiveBubbles++;
+	}
+
+	public void CreateNewOtherPlayerBubble(string NewBubbleName, float NewBubbleScale, Vector3 NewBubblePosition, Quaternion NewBubbleRotation)
+	{
+		//создаем новый шарик для другого игрока
+		Vector3 PosToGenerate = new Vector3(NewBubblePosition.x + Screen.width/2,NewBubblePosition.y,NewBubblePosition.z);
+		Other_Bubbles_Pool.Spawn(PosToGenerate,NewBubbleScale,NewBubbleRotation,NewBubbleName);
 	}
 
 	private void SetDifficulty()

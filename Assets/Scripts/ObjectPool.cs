@@ -16,7 +16,8 @@ public class ObjectPool : MonoBehaviour
 	public enum ObjectType
 	{
 		Bubble,
-		BubbleBoom
+		BubbleBoom,
+		BubbleOtherPlayer
 	}
 
 	public ObjectType objectType;
@@ -37,6 +38,13 @@ public class ObjectPool : MonoBehaviour
 			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject2);
 			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject3);
 			ObjectPrefab.Add(StartSceneLogic.BubbleBoomPrefabObject4);
+		}
+		else if (objectType == ObjectType.BubbleOtherPlayer)
+		{
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject1);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject2);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject3);
+			ObjectPrefab.Add(StartSceneLogic.BubblePrefabObject4);
 		}
 	}
 
@@ -77,7 +85,13 @@ public class ObjectPool : MonoBehaviour
 
 		if (objectType == ObjectType.Bubble)
 		{
-			newObject.GetComponent<Bubble>().SetPool(this);
+			Bubble newBubble = newObject.GetComponent<Bubble>();
+			newBubble.SetPool(this);
+
+			if (objectType == ObjectType.BubbleOtherPlayer)
+			{
+				newBubble.OtherPlayerIsOwner = true;
+			}
 		}
 		else if (objectType == ObjectType.BubbleBoom)
 		{
@@ -122,7 +136,7 @@ public class ObjectPool : MonoBehaviour
 
 	public void Spawn(Vector3 posToSpawn,Vector3 scaleToUse,Quaternion rot)
 	{
-		//спавним объект в заданных координатах
+		//спавним объект в заданных координатах (Для разломанных)
 		if (CurrentActiveNumber < ObjectInPool.Count)
 		{
 			GameObject objectToSpawn = GetObjectToSpawn();
@@ -133,7 +147,36 @@ public class ObjectPool : MonoBehaviour
 				objectToSpawn.transform.position = posToSpawn;
 				objectToSpawn.transform.rotation = rot;
 				objectToSpawn.transform.localScale = scaleToUse;
-				objectToSpawn.GetComponent<BubbleBroken>().SetWave(levelManager.DifficultyLevel);
+
+				if (objectType == ObjectType.BubbleBoom)
+				{
+					objectToSpawn.GetComponent<BubbleBroken>().SetWave(levelManager.DifficultyLevel);
+				}
+				CurrentActiveNumber++;
+			}
+		}
+	}
+
+	public void Spawn(Vector3 posToSpawn,float scaleFactor,Quaternion rot,string bubbleName)
+	{
+		//спавним объект в заданных координатах (Для шариков другого игрока)
+		if (CurrentActiveNumber < ObjectInPool.Count)
+		{
+			GameObject objectToSpawn = GetObjectToSpawn();
+			
+			if (objectToSpawn != null)
+			{
+				if (objectType == ObjectType.BubbleOtherPlayer)
+				{
+					Bubble newBubble = objectToSpawn.GetComponent<Bubble>();
+
+					objectToSpawn.SetActive(true);
+					objectToSpawn.transform.position = posToSpawn;
+					objectToSpawn.transform.rotation = rot;	
+
+					newBubble.SetParametersFromNetwork(scaleFactor,bubbleName);
+					newBubble.SetWave(levelManager.DifficultyLevel);
+				}
 				CurrentActiveNumber++;
 			}
 		}
@@ -150,7 +193,12 @@ public class ObjectPool : MonoBehaviour
 			{
 				objectToSpawn.SetActive(true);
 				objectToSpawn.transform.position = posToSpawn;
-				objectToSpawn.GetComponent<Bubble>().SetWave(levelManager.DifficultyLevel);
+
+				if (objectType == ObjectType.Bubble)
+				{
+					objectToSpawn.GetComponent<Bubble>().SetWave(levelManager.DifficultyLevel);
+				}
+
 				CurrentActiveNumber++;
 			}
 		}

@@ -10,6 +10,7 @@ public class Bubble : BubbleParent
 	private float MaxSpeed = 4;					//максимально допустимая скорость
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
 
+	public bool OtherPlayerIsOwner = false;		//true если это шарик другого игрока
 
 	void OnEnable()
 	{
@@ -20,6 +21,16 @@ public class Bubble : BubbleParent
 			CheckMaterial();
 		}
 		GenerateBubble();
+
+		if (!OtherPlayerIsOwner)
+		{
+			//если владелец текущий игрок, то отправляем команду на создании копии другому игроку
+			if (pool)
+			{
+//				pool.GetLevelManager().networkManager.SendBubbleCreated(transform.name,ScaleFactor,transform.position,transform.rotation);
+				pool.GetLevelManager().networkManager.SendBubbleCreated(transform.name,ScaleFactor,Vector3.zero,Quaternion.identity);
+			}
+		}
 	}
 
 	void Update()
@@ -54,7 +65,15 @@ public class Bubble : BubbleParent
 
 		GetComponent<Renderer>().sharedMaterial = StartSceneLogic.Diskmat;
 	}
-	
+
+	public void SetParametersFromNetwork(float networkScaleFactor,string NetworkName)
+	{
+		//присваеваем параметры от шарика другого игрока
+		OtherPlayerIsOwner = true;
+		ScaleFactor = networkScaleFactor;
+		transform.name = NetworkName;
+	}
+
 	override public void CheckMaterial()
 	{
 		//проверяем какой материал использовать
@@ -75,7 +94,11 @@ public class Bubble : BubbleParent
 
 		transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;
 
-		ScaleFactor = Random.Range(0.4f,1.0f);
+		if (!OtherPlayerIsOwner)
+		{
+			ScaleFactor = Random.Range(0.4f,1.0f);
+		}
+
 		Points = (int) (Points/ScaleFactor);
 		Speed = Speed/ScaleFactor;
 		Speed = Mathf.Clamp(Speed,0.1f,MaxSpeed) + pool.GetLevelManager().DifficultyLevel * 0.1f;
@@ -93,16 +116,27 @@ public class Bubble : BubbleParent
 
 		if (addPointsOrNot)
 		{
-			pool.GetLevelManager().AddPoints(Points);
+			if (!OtherPlayerIsOwner)
+			{
+				pool.GetLevelManager().AddPoints(Points);
+			}
+
 			pool.GetLevelManager().Bubble_Boom_Pool.Spawn(transform.position,transform.localScale,transform.localRotation);
 		}
 		else
 		{
-			pool.GetLevelManager().LooseLive();
+			if (!OtherPlayerIsOwner)
+			{
+				pool.GetLevelManager().LooseLive();
+			}
 		}
-		pool.GetLevelManager().ActiveBubbles--;
-		pool.GetLevelManager().CheckForNextWave();
-		pool.GetLevelManager().GetBubblesOnStage().Remove(this);
-		pool.DeSpawn(this.name);
+
+		if (!OtherPlayerIsOwner)
+		{
+			pool.GetLevelManager().ActiveBubbles--;
+			pool.GetLevelManager().CheckForNextWave();
+			pool.GetLevelManager().GetBubblesOnStage().Remove(this);
+			pool.DeSpawn(this.name);
+		}
 	}
 }

@@ -15,9 +15,12 @@ public class GUIManager : MonoBehaviour
 	public UILabel PlayerNameLabel;
 	public UILabel EnemyNameLabel;
 
+	public GameObject WaitingLabel;
+
 	public GameObject EnterNamePanel;
 	public UILabel EnterNameLabel;
 	public GameObject NetworkParametersPanel;
+	public GameObject ReadyPanel;
 
 	private string PlayerName = "";
 	private string EnemysName = "";
@@ -59,9 +62,10 @@ public class GUIManager : MonoBehaviour
 		PlayerNameLabel.text = PlayerName;
 	}
 
-	private void UpdateEnemysName()
+	public void UpdateEnemysName(string enemyName)
 	{
 		//обновляем label
+		EnemysName = enemyName;
 		EnemyNameLabel.text = EnemysName;
 	}
 
@@ -100,19 +104,40 @@ public class GUIManager : MonoBehaviour
 		NGUITools.SetActive(EnterNamePanel,true);
 	}
 
-	public void StartPressed()
+	public void NameEntered()
 	{
 		//Нажата кнопка старта игры в панели введения имени
 		NGUITools.SetActive(EnterNamePanel,false);
-
+		
 		if (PlayerName == "")
 		{
 			OnSubmitName(EnterNameLabel.text);
 		}
-
+		
 		UpdatePlayerName();
 		levelManager.networkManager.SendPlayerName(PlayerName);
 
-		levelManager.StartGame();
+		NGUITools.SetActive(ReadyPanel,true);
+	}
+
+	public void OtherIsReady()
+	{
+		//второй игрок нажал "Start game"
+		NGUITools.SetActive(WaitingLabel,false);
+		levelManager.OtherIsReadyRecieved();
+	}
+
+	public void StartPressed()
+	{
+		//нажата кнопка готовности игры
+		NGUITools.SetActive(ReadyPanel,false);
+
+		if (!levelManager.GetOtherIsReady())
+		{
+			NGUITools.SetActive(WaitingLabel,true);
+		}
+
+		levelManager.networkManager.SendStartButtonPressed();
+		levelManager.StartButtonPressed();
 	}
 }

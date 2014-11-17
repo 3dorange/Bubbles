@@ -10,6 +10,9 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+
 public class SocketManagement : MonoBehaviour 
 {
 	private IPAddress _IP ;				
@@ -17,11 +20,14 @@ public class SocketManagement : MonoBehaviour
 	private TcpListener _TCP;			
 	private TcpClient _CLIENT;			
 	private NetworkStream _STREAM;		
+	private SerializeManager serializeManager;
 
 	public SocketManagement(string ip_Adress,int port)
 	{
 		_IP = IPAddress.Parse(ip_Adress);		//переводим строчку в ip адресс
 		_PORT = port;
+		serializeManager = new SerializeManager();
+		Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER","yes");
 	}
 
 	public bool StartAsServer() 
@@ -36,7 +42,7 @@ public class SocketManagement : MonoBehaviour
 		}
 		catch (Exception ex) 
 		{ 
-			Debug.Log("StartAsServer error");
+			Debug.Log("StartAsServer error " + ex);
 			return false; 
 		}
 		return true;
@@ -44,7 +50,7 @@ public class SocketManagement : MonoBehaviour
 	
 	public TcpClient GetTcpClient() 
 	{
-		Debug.Log("GetTcpClient");
+//		Debug.Log("GetTcpClient");
 		return _TCP.AcceptTcpClient();
 	}
 
@@ -59,44 +65,56 @@ public class SocketManagement : MonoBehaviour
 		}
 		catch (Exception ex) 
 		{ 
-			Debug.Log("StartAsClient error");
+			Debug.Log("StartAsClient error" + ex);
 			return false; 
 		}
 		return true;
 	}
 
-	public bool SendCommand() 
+	public bool SendCommand(NetworkCommand CommandToSend) 
 	{
 		//отправляем сообщение в поток
 		try
-		{
-			string temp = "Test Message 100143445";
-			Debug.Log("SendCommand");	
-			byte[] bytes = new byte[255];
-			bytes = new ASCIIEncoding().GetBytes(temp);
-			_STREAM.Write(bytes, 0, bytes.Length);
+		{			
+			BinaryFormatter formatter = new BinaryFormatter();
+
+			try
+			{
+				formatter.Serialize(_STREAM,CommandToSend);
+			}
+			catch (SerializationException e)
+			{
+				Debug.Log(e);
+			}
 		}
 		catch (Exception ex) 
 		{ 
-			Debug.Log("SendCommand error");
+			Debug.Log("SendCommand error" + ex);
 			return false; 
 		}
 		return true;
 	}
 
-	public void GetCommand() 
+	public NetworkCommand GetCommand() 
 	{
 		//забираем сообщение из потока
+		NetworkCommand RecievedCommnad = new NetworkCommand();
+
 		if (_STREAM.DataAvailable)
 		{
-			byte[] bytes = new byte[255];
-			_STREAM.Read(bytes,0,bytes.Length);
+			BinaryFormatter formatter = new BinaryFormatter();
 
-			string temp = new ASCIIEncoding().GetString(bytes);
-			char[] charOfTemp = temp.ToCharArray();
-
-			Debug.Log("Get Command :" + temp);
+			try
+			{
+				RecievedCommnad = (NetworkCommand) formatter.Deserialize(_STREAM);
+			}
+			catch (SerializationException e)
+			{
+				Debug.Log(e);
+			}
 		}
+
+		return RecievedCommnad;
 	}
 }
 
