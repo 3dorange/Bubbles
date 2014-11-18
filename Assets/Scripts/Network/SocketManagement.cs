@@ -15,12 +15,11 @@ using System.Runtime.Serialization;
 
 public class SocketManagement : MonoBehaviour 
 {
-	private IPAddress _IP ;				
+	private IPAddress _IP ;							
 	private int _PORT;					
 	private TcpListener _TCP;			
 	private TcpClient _CLIENT;			
-	private NetworkStream _STREAM;		
-	private SerializeManager serializeManager;
+	private NetworkStream _STREAM;
 
 	private ManualResetEvent clientConnected = new ManualResetEvent(false);
 
@@ -28,12 +27,12 @@ public class SocketManagement : MonoBehaviour
 	{
 		_IP = IPAddress.Parse(ip_Adress);		//переводим строчку в ip адресс
 		_PORT = port;
-		serializeManager = new SerializeManager();
 		Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER","yes");
 	}
 
 	public void Disconnect()
 	{
+		//отключаем соединение
 		_STREAM.Close();
 	}
 
@@ -57,6 +56,7 @@ public class SocketManagement : MonoBehaviour
 	
 	public TcpClient GetTcpClient() 
 	{
+		//ждем ответа от клиента
 		return _TCP.AcceptTcpClient();
 	}
 
