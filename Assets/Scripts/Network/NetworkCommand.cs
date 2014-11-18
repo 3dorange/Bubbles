@@ -13,5 +13,6 @@ public class NetworkCommand
 	public float CreatedBubble_Scale;				//размер нового шара
 	public Vector3Serializer CreatedBubble_Pos;		//положение нового шара
 	public QuaternionSerializer CreatedBubble_Rot;	//вращение нового шара
+	public int Score;								//кол-во очков
 
 }

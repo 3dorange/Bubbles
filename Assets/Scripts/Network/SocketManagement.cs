@@ -22,12 +22,19 @@ public class SocketManagement : MonoBehaviour
 	private NetworkStream _STREAM;		
 	private SerializeManager serializeManager;
 
+	private ManualResetEvent clientConnected = new ManualResetEvent(false);
+
 	public SocketManagement(string ip_Adress,int port)
 	{
 		_IP = IPAddress.Parse(ip_Adress);		//переводим строчку в ip адресс
 		_PORT = port;
 		serializeManager = new SerializeManager();
 		Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER","yes");
+	}
+
+	public void Disconnect()
+	{
+		_STREAM.Close();
 	}
 
 	public bool StartAsServer() 
@@ -50,7 +57,6 @@ public class SocketManagement : MonoBehaviour
 	
 	public TcpClient GetTcpClient() 
 	{
-//		Debug.Log("GetTcpClient");
 		return _TCP.AcceptTcpClient();
 	}
 
@@ -100,17 +106,20 @@ public class SocketManagement : MonoBehaviour
 		//забираем сообщение из потока
 		NetworkCommand RecievedCommnad = new NetworkCommand();
 
-		if (_STREAM.DataAvailable)
+		if (_STREAM.CanRead)
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
+			if (_STREAM.DataAvailable)
+			{
+				BinaryFormatter formatter = new BinaryFormatter();
 
-			try
-			{
-				RecievedCommnad = (NetworkCommand) formatter.Deserialize(_STREAM);
-			}
-			catch (SerializationException e)
-			{
-				Debug.Log(e);
+				try
+				{
+					RecievedCommnad = (NetworkCommand) formatter.Deserialize(_STREAM);
+				}
+				catch (SerializationException e)
+				{
+					Debug.Log(e);
+				}
 			}
 		}
 

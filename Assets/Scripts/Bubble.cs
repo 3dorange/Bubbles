@@ -41,7 +41,7 @@ public class Bubble : BubbleParent
 
 			if (transform.position.y < -4.5f)
 			{
-				DestroyBubble(false);
+				DestroyBubble(false,false);
 			}
 		}
 	}
@@ -117,10 +117,27 @@ public class Bubble : BubbleParent
 		pool.GetLevelManager().GetBubblesOnStage().Add(this);
 	}
 
-	public void DestroyBubble(bool addPointsOrNot)
+	public void DestroyBubble(bool addPointsOrNot,bool cleanUp)
 	{
 		//функция уничтожения шарика, которая отключает шар
 		CanMove = false;
+
+		if (cleanUp)
+		{
+			//удаление ненужных
+			if (!OtherPlayerIsOwner)
+			{
+				pool.GetLevelManager().ActiveBubbles--;
+				pool.GetLevelManager().GetBubblesOnStage().Remove(this);
+			}
+			else
+			{
+				transform.name = DefaultName;
+			}
+
+			pool.DeSpawn(this.name);
+			return;
+		}
 
 		if (addPointsOrNot)
 		{
@@ -137,6 +154,10 @@ public class Bubble : BubbleParent
 			if (!OtherPlayerIsOwner)
 			{
 				pool.GetLevelManager().LooseLive();
+			}
+			else
+			{
+				pool.GetLevelManager().OtherPlayerLostLive();
 			}
 		}
 

@@ -30,6 +30,15 @@ public class GUIManager : MonoBehaviour
 	public UILabel IP_Label;
 	public UILabel Port_Label;
 
+	//игра окончена
+	public GameObject PlayerWinLabel;
+	public GameObject PlayerLostLabel;
+	public GameObject OtherPlayerWinLabel;
+	public GameObject OtherPlayerLostLabel;
+
+	public GameObject GameEndPanel;
+	//
+
 	public void SetLevelManager(LevelManager levM)
 	{
 		levelManager = levM;
@@ -120,11 +129,28 @@ public class GUIManager : MonoBehaviour
 		NGUITools.SetActive(ReadyPanel,true);
 	}
 
-	public void OtherIsReady()
+	public void Win()
 	{
-		//второй игрок нажал "Start game"
-		NGUITools.SetActive(WaitingLabel,false);
-		levelManager.OtherIsReadyRecieved();
+		NGUITools.SetActive(PlayerWinLabel,true);
+		NGUITools.SetActive(PlayerLostLabel,false);
+		
+		NGUITools.SetActive(OtherPlayerWinLabel,false);
+		NGUITools.SetActive(OtherPlayerLostLabel,true);
+
+		NGUITools.SetActive(GameEndPanel,true);
+		levelManager.ResetGame();
+	}
+
+	public void Lost()
+	{
+		NGUITools.SetActive(PlayerWinLabel,false);
+		NGUITools.SetActive(PlayerLostLabel,true);
+		
+		NGUITools.SetActive(OtherPlayerWinLabel,true);
+		NGUITools.SetActive(OtherPlayerLostLabel,false);
+
+		NGUITools.SetActive(GameEndPanel,true);
+		levelManager.ResetGame();
 	}
 
 	public void SinglePressed()
@@ -149,4 +175,44 @@ public class GUIManager : MonoBehaviour
 		levelManager.networkManager.SendStartButtonPressed();
 		levelManager.StartButtonPressed();
 	}
+
+	public void OtherIsReady()
+	{
+		//второй игрок нажал "Start game"
+		NGUITools.SetActive(WaitingLabel,false);
+		levelManager.OtherIsReadyRecieved();
+	}
+
+	public void StartNewGamePressed()
+	{
+		//начинаем игру полностью заново
+		NGUITools.SetActive(GameEndPanel,false);
+		NGUITools.SetActive(PlayerWinLabel,false);
+		NGUITools.SetActive(PlayerLostLabel,false);		
+		NGUITools.SetActive(OtherPlayerWinLabel,false);
+		NGUITools.SetActive(OtherPlayerLostLabel,false);
+
+		levelManager.networkManager.Disconnect();
+
+		//просто перезагружаем текущую сцену
+		Application.LoadLevel(Application.loadedLevel);
+	}
+
+	public void RestartPressed()
+	{
+		//начинаем игру заново с этим же противников
+		if (levelManager.networkManager.isSingle)
+		{
+			StartNewGamePressed();
+		}
+
+		NGUITools.SetActive(GameEndPanel,false);
+		NGUITools.SetActive(PlayerWinLabel,false);
+		NGUITools.SetActive(PlayerLostLabel,false);		
+		NGUITools.SetActive(OtherPlayerWinLabel,false);
+		NGUITools.SetActive(OtherPlayerLostLabel,false);
+
+		StartPressed();
+	}
+	
 }

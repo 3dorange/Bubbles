@@ -13,9 +13,11 @@ public class LevelManager : MonoBehaviour
 	public NetworkManager networkManager;					//менеджер мультиплеера
 
 	private int PointsEarned = 0;
-	private int PlayerLives = 10;
+	private int PlayerLives = 25;
+	private int EnemyLives = 25;
 
-	private bool GameStarted = false;
+	public bool GameStarted = false;
+	public bool GameEnded = false;
 
 	public int DifficultyLevel = 0;									//уровень сложности игры
 	private float TimeToWaitForNextBubble = 0;						//время между появлением следующего шарика
@@ -32,8 +34,8 @@ public class LevelManager : MonoBehaviour
 	public List<BubbleBroken> BubbleBoomsOnStage = new List<BubbleBroken>();		//список сломанных шариков на экране
 
 	//network
-	private bool StartPressed = false;
-	private bool OtherIsReady = false;
+	public bool StartPressed = false;
+	public bool OtherIsReady = false;
 
 	void Awake()
 	{
@@ -54,11 +56,36 @@ public class LevelManager : MonoBehaviour
 	void Start()
 	{
 		ResetGame();
+		ResetGuiPart();
+	}
+
+	public void ResetGame()
+	{
+		//обнуляем параметры игры		
+		DifficultyLevel = 0;
+		
+		GameEnded = false;
+		GameStarted = false;
+		
+		OtherIsReady = false;
+		StartPressed = false;
+	}
+
+	public void ResetGuiPart()
+	{
+		guiManager.PlayerScore.text = "Score : " + 0;
+		EnemyLives = 25;
+		PlayerLives = 25;
+		PointsEarned = 0;
+
+		UpdatePlayerLive();
+		UpdateOtherPlayerLive();
+		UpdateOtherPlayerScore(0);
 	}
 
 	void Update()
 	{
-		if (GameStarted)
+		if (GameStarted && !GameEnded)
 		{
 			if (BubblesToGenerateInWave > 0)
 			{
@@ -141,11 +168,26 @@ public class LevelManager : MonoBehaviour
 	private void Win()
 	{
 		// все уровни успешно пройдены
+		GameEnded = true;
+		guiManager.Win();
+		RemoveAll();
+		ResetGuiPart();
+	}
+
+	private void RemoveAll()
+	{
+		Bubbles_Pool.DeSpawnAll();
+		Bubble_Boom_Pool.DeSpawnAll();
+		Other_Bubbles_Pool.DeSpawnAll();
 	}
 
 	private void GameOver()
 	{
 		// жизни закончились
+		GameEnded = true;
+		guiManager.Lost();
+		RemoveAll();
+		ResetGuiPart();
 	}
 
 	private void GenerateBubble()
@@ -211,13 +253,6 @@ public class LevelManager : MonoBehaviour
 		}		
 	}
 
-	private void ResetGame()
-	{
-		//обнуляем параметры игры
-		UpdatePlayerScore();
-		UpdatePlayerLive();
-	}
-
 	public void AddPoints(int points)
 	{
 		PointsEarned +=points;					//добавляем очки за шар, к уже заработанным
@@ -227,14 +262,43 @@ public class LevelManager : MonoBehaviour
 	public void LooseLive()
 	{
 		//вычитаем 1 жизнь
-		PlayerLives--;
-		UpdatePlayerLive();
+		if (!GameEnded)
+		{
+			PlayerLives--;
+			UpdatePlayerLive();
+
+			if (PlayerLives <= 0)
+			{
+				GameOver();
+			}
+		}
+	}
+
+	public void OtherPlayerLostLive()
+	{
+		//вычитаем жизнь у противника
+		if (!GameEnded)
+		{
+			EnemyLives--;
+			UpdateOtherPlayerLive();
+
+			if (EnemyLives <= 0)
+			{
+				Win();
+			}
+		}
 	}
 
 	private void UpdatePlayerLive()
 	{
 		//обновляем кол-во очков игрока в интерфейсе
 		guiManager.PlayerLives.text = "Lives : " + PlayerLives;
+	}
+
+	public void UpdateOtherPlayerLive()
+	{
+		//обновляем кол-во очков игрока в интерфейсе
+		guiManager.EnemyLives.text = "Lives : " + EnemyLives;
 	}
 
 	public List<Bubble> GetBubblesOnStage()
@@ -251,6 +315,13 @@ public class LevelManager : MonoBehaviour
 	{
 		//обновляем кол-во очков игрока в интерфейсе
 		guiManager.PlayerScore.text = "Score : " + PointsEarned;
+		networkManager.SendScore(PointsEarned);
+	}
+
+	public void UpdateOtherPlayerScore(int otherScore)
+	{
+		//обновляем кол-во очков другого игрока в интерфейсе
+		guiManager.EnemyScore.text = "Score : " + otherScore;
 	}
 
 	public void StartGame()

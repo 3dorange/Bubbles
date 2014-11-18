@@ -44,7 +44,7 @@ public class InputManager : MonoBehaviour
 
 				if (!hitBubble.OtherPlayerIsOwner)
 				{
-					hitBubble.DestroyBubble(true);
+					hitBubble.DestroyBubble(true,false);
 				}
 			}
 		}

@@ -227,6 +227,27 @@ public class ObjectPool : MonoBehaviour
 		return null;
 	}
 
+	public void DeSpawnAll()
+	{
+		//деспаун всех объектов данного пула
+		Transform[] objs = this.gameObject.GetComponentsInChildren<Transform>();
+
+		for (int i = 0; i < objs.Length;i++)
+		{
+			if (objs[i].name != transform.name)
+			{
+				if (objectType == ObjectType.Bubble || objectType == ObjectType.BubbleOtherPlayer )
+				{
+					objs[i].GetComponent<Bubble>().DestroyBubble(false,true);
+				}
+				else if (objectType == ObjectType.BubbleBoom)
+				{
+//					objs[i].GetComponent<BubbleBroken>().DestroyBubbleBoom();
+				}
+			}
+		}
+	}
+
 	public void DeSpawn(string ObjectName)
 	{
 		//деспавним объект

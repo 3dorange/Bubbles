@@ -17,7 +17,7 @@ public class NetworkManager : MonoBehaviour
 	private bool connected = false;
 	private float netWait = 0.0f;					//время между запросом данных из потока
 
-	private bool isSingle = false;					// работает ли мультиплеер или играем одни
+	public bool isSingle = false;					// работает ли мультиплеер или играем одни
 
 	void Update()
 	{
@@ -62,9 +62,9 @@ public class NetworkManager : MonoBehaviour
 				OtherPlayerIsReady();
 				break;
 
-//			case 101:
-//				StartTheGame();
-//				break;
+			case 101:
+				RecievedOtherPlayerScore(recievedCommand.Score);
+				break;
 
 			case 102:
 				CreateNewEnemyBubble(recievedCommand.CreatedBubble_Name,recievedCommand.CreatedBubble_Scale,recievedCommand.CreatedBubble_Pos,recievedCommand.CreatedBubble_Rot);
@@ -90,6 +90,11 @@ public class NetworkManager : MonoBehaviour
 		levelManager.guiManager.OtherIsReady();
 	}
 
+	private void RecievedOtherPlayerScore(int otherScore)
+	{
+		//получаем кол-во очков другого игрока
+		levelManager.UpdateOtherPlayerScore(otherScore);
+	}
 
 	private void SetEnemyName(string enemyName)
 	{
@@ -118,7 +123,11 @@ public class NetworkManager : MonoBehaviour
 		if (!isSingle)
 		{
 			GameObject objectToRemove = levelManager.Other_Bubbles_Pool.GetByName(PressedBubbleName);
-			objectToRemove.GetComponent<Bubble>().DestroyBubble(true);
+
+			if (objectToRemove)
+			{
+				objectToRemove.GetComponent<Bubble>().DestroyBubble(true,false);
+			}
 		}
 	}
 
@@ -132,6 +141,15 @@ public class NetworkManager : MonoBehaviour
 				isServer = true;
 				ConnectAsServer(ip_Adress, Int32.Parse(port));
 			}
+		}
+	}
+
+	public void Disconnect()
+	{
+		//отключаемся
+		if (!isSingle)
+		{
+			socketManager.Disconnect();
 		}
 	}
 
@@ -212,27 +230,29 @@ public class NetworkManager : MonoBehaviour
 			StartButtonPressedCommand.CreatedBubble_Scale = 0;
 			StartButtonPressedCommand.CreatedBubble_Pos = null;
 			StartButtonPressedCommand.CreatedBubble_Rot = null;
-			
+			StartButtonPressedCommand.Score = 0;
+
 			socketManager.SendCommand(StartButtonPressedCommand);
 		}
 	}
 
-	public void SendStartGame()
+	public void SendScore(int scoreToSend)
 	{
-		//отправляем команду на то что игру можно начинать
+		//отправляем очки
 		if (!isSingle)
 		{
-			NetworkCommand SendStartGameCommand = new NetworkCommand();
+			NetworkCommand SendScoreGameCommand = new NetworkCommand();
 			
-			SendStartGameCommand.keyCode = 101;
-			SendStartGameCommand.PlayerNameN = null;
-			SendStartGameCommand.BubbleNameToDestroy = null;
-			SendStartGameCommand.CreatedBubble_Name = null;
-			SendStartGameCommand.CreatedBubble_Scale = 0;
-			SendStartGameCommand.CreatedBubble_Pos = null;
-			SendStartGameCommand.CreatedBubble_Rot = null;
-			
-			socketManager.SendCommand(SendStartGameCommand);
+			SendScoreGameCommand.keyCode = 101;
+			SendScoreGameCommand.PlayerNameN = null;
+			SendScoreGameCommand.BubbleNameToDestroy = null;
+			SendScoreGameCommand.CreatedBubble_Name = null;
+			SendScoreGameCommand.CreatedBubble_Scale = 0;
+			SendScoreGameCommand.CreatedBubble_Pos = null;
+			SendScoreGameCommand.CreatedBubble_Rot = null;
+			SendScoreGameCommand.Score = scoreToSend;
+
+			socketManager.SendCommand(SendScoreGameCommand);
 		}
 	}
 
@@ -256,7 +276,8 @@ public class NetworkManager : MonoBehaviour
 			SendBubbleCreatedCommand.CreatedBubble_Scale = NewBubbleScale;
 			SendBubbleCreatedCommand.CreatedBubble_Pos = newVector;
 			SendBubbleCreatedCommand.CreatedBubble_Rot = newRot;
-			
+			SendBubbleCreatedCommand.Score = 0;
+
 			socketManager.SendCommand(SendBubbleCreatedCommand);
 		}
 	}
@@ -275,8 +296,8 @@ public class NetworkManager : MonoBehaviour
 			SendBubbleWasPressedCommand.CreatedBubble_Scale = 0;
 			SendBubbleWasPressedCommand.CreatedBubble_Pos = null;
 			SendBubbleWasPressedCommand.CreatedBubble_Rot = null;
+			SendBubbleWasPressedCommand.Score = 0;
 
-			Debug.Log(SendBubbleWasPressedCommand.BubbleNameToDestroy);
 			socketManager.SendCommand(SendBubbleWasPressedCommand);
 		}
 	}
@@ -295,6 +316,7 @@ public class NetworkManager : MonoBehaviour
 			SendPlayerNameCommand.CreatedBubble_Scale = 0;
 			SendPlayerNameCommand.CreatedBubble_Pos = null;
 			SendPlayerNameCommand.CreatedBubble_Rot = null;
+			SendPlayerNameCommand.Score = 0;
 
 			socketManager.SendCommand(SendPlayerNameCommand);
 		}
