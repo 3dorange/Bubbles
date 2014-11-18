@@ -40,6 +40,7 @@ public class LevelManager : MonoBehaviour
 		inputManager.SetLevelManager(this);		//указываем менеджеру ввода на этот класс
 		Bubbles_Pool.SetLevelManager(this);
 		Bubble_Boom_Pool.SetLevelManager(this);
+		Other_Bubbles_Pool.SetLevelManager(this);
 		guiManager.SetLevelManager(this);
 		networkManager.SetLevelManager(this);
 
@@ -53,7 +54,6 @@ public class LevelManager : MonoBehaviour
 	void Start()
 	{
 		ResetGame();
-//		StartGame();
 	}
 
 	void Update()
@@ -162,7 +162,7 @@ public class LevelManager : MonoBehaviour
 	public void CreateNewOtherPlayerBubble(string NewBubbleName, float NewBubbleScale, Vector3 NewBubblePosition, Quaternion NewBubbleRotation)
 	{
 		//создаем новый шарик для другого игрока
-		Vector3 PosToGenerate = new Vector3(NewBubblePosition.x + Screen.width/2,NewBubblePosition.y,NewBubblePosition.z);
+		Vector3 PosToGenerate = new Vector3(NewBubblePosition.x + 6.6f,NewBubblePosition.y,NewBubblePosition.z);
 		Other_Bubbles_Pool.Spawn(PosToGenerate,NewBubbleScale,NewBubbleRotation,NewBubbleName);
 	}
 

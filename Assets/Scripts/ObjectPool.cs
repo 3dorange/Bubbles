@@ -85,17 +85,18 @@ public class ObjectPool : MonoBehaviour
 
 		if (objectType == ObjectType.Bubble)
 		{
-			Bubble newBubble = newObject.GetComponent<Bubble>();
-			newBubble.SetPool(this);
-
-			if (objectType == ObjectType.BubbleOtherPlayer)
-			{
-				newBubble.OtherPlayerIsOwner = true;
-			}
+			newObject.GetComponent<Bubble>().SetPool(this);
 		}
 		else if (objectType == ObjectType.BubbleBoom)
 		{
 			newObject.GetComponent<BubbleBroken>().SetPool(this);
+		}
+		else if (objectType == ObjectType.BubbleOtherPlayer)
+		{
+			Bubble newBubble = newObject.GetComponent<Bubble>();
+			newBubble.SetPool(this);
+			newBubble.OtherPlayerIsOwner = true;
+			newBubble.SetDefaultName(newObject.name);
 		}
 
 		ObjectInPool.Add(newObject);
@@ -170,12 +171,14 @@ public class ObjectPool : MonoBehaviour
 				{
 					Bubble newBubble = objectToSpawn.GetComponent<Bubble>();
 
-					objectToSpawn.SetActive(true);
-					objectToSpawn.transform.position = posToSpawn;
-					objectToSpawn.transform.rotation = rot;	
-
 					newBubble.SetParametersFromNetwork(scaleFactor,bubbleName);
+					objectToSpawn.SetActive(true);
+
+					objectToSpawn.transform.position = posToSpawn;
+					objectToSpawn.transform.rotation = rot;
+
 					newBubble.SetWave(levelManager.DifficultyLevel);
+
 				}
 				CurrentActiveNumber++;
 			}
@@ -191,8 +194,9 @@ public class ObjectPool : MonoBehaviour
 			
 			if (objectToSpawn != null)
 			{
-				objectToSpawn.SetActive(true);
 				objectToSpawn.transform.position = posToSpawn;
+				objectToSpawn.SetActive(true);
+
 
 				if (objectType == ObjectType.Bubble)
 				{
@@ -202,6 +206,25 @@ public class ObjectPool : MonoBehaviour
 				CurrentActiveNumber++;
 			}
 		}
+	}
+
+	public GameObject GetByName(string objectName)
+	{
+		//ищем объект в чайлдах данного пула
+		if (objectType == ObjectType.Bubble || objectType == ObjectType.BubbleOtherPlayer)
+		{
+			Bubble[] bubbles = this.gameObject.GetComponentsInChildren<Bubble>();
+
+			for (int i = 0; i < bubbles.Length;i++)
+			{
+				if (bubbles[i].name == objectName)
+				{
+					return bubbles[i].gameObject;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public void DeSpawn(string ObjectName)

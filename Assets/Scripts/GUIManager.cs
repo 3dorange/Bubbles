@@ -127,6 +127,15 @@ public class GUIManager : MonoBehaviour
 		levelManager.OtherIsReadyRecieved();
 	}
 
+	public void SinglePressed()
+	{
+		//нажата кнопка игры в сингл режим
+		levelManager.networkManager.ThisGameIsSingle();
+		levelManager.OtherIsReadyRecieved();
+		levelManager.StartButtonPressed();
+		NGUITools.SetActive(NetworkParametersPanel,false);
+	}
+
 	public void StartPressed()
 	{
 		//нажата кнопка готовности игры

@@ -3,7 +3,7 @@ using System.Collections;
 
 [System.Serializable()]
 
-public class QuaternionSerializer : MonoBehaviour 
+public class QuaternionSerializer 
 {
 	//эмуляция кватарниона для нужнд сериализации
 	public float x;

@@ -11,6 +11,7 @@ public class Bubble : BubbleParent
 	private bool CanMove = false;				//может ли шар начать движения, или должен висеть на месте
 
 	public bool OtherPlayerIsOwner = false;		//true если это шарик другого игрока
+	private string DefaultName;
 
 	void OnEnable()
 	{
@@ -27,8 +28,7 @@ public class Bubble : BubbleParent
 			//если владелец текущий игрок, то отправляем команду на создании копии другому игроку
 			if (pool)
 			{
-//				pool.GetLevelManager().networkManager.SendBubbleCreated(transform.name,ScaleFactor,transform.position,transform.rotation);
-				pool.GetLevelManager().networkManager.SendBubbleCreated(transform.name,ScaleFactor,Vector3.zero,Quaternion.identity);
+				pool.GetLevelManager().networkManager.SendBubbleCreated(transform.name,ScaleFactor,transform.position,transform.rotation);
 			}
 		}
 	}
@@ -46,6 +46,11 @@ public class Bubble : BubbleParent
 		}
 	}
 
+	public void SetDefaultName(string defN)
+	{
+		DefaultName = defN;
+	}
+
 	private void MoveBubble()
 	{
 		float PosY = transform.position.y - Speed*Time.deltaTime;
@@ -55,7 +60,11 @@ public class Bubble : BubbleParent
 	private void ResetToDefault()
 	{
 		//устанавливаем значения параметров на дефолтные
-		ScaleFactor = 1;				
+		if (!OtherPlayerIsOwner)
+		{
+			ScaleFactor = 1;
+		}
+
 		Points = 100;					
 		Speed = 2;					
 		CanMove = false;
@@ -92,10 +101,9 @@ public class Bubble : BubbleParent
 		//функция которая генерит параметры шарика при его создании
 		ResetToDefault();
 
-		transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;
-
 		if (!OtherPlayerIsOwner)
 		{
+			transform.rotation = Quaternion.AngleAxis(Random.Range(0.0f,360.0f), transform.forward) * transform.rotation;				
 			ScaleFactor = Random.Range(0.4f,1.0f);
 		}
 
@@ -119,6 +127,7 @@ public class Bubble : BubbleParent
 			if (!OtherPlayerIsOwner)
 			{
 				pool.GetLevelManager().AddPoints(Points);
+				pool.GetLevelManager().networkManager.SendBubbleWasPressed(transform.name);
 			}
 
 			pool.GetLevelManager().Bubble_Boom_Pool.Spawn(transform.position,transform.localScale,transform.localRotation);
@@ -136,7 +145,12 @@ public class Bubble : BubbleParent
 			pool.GetLevelManager().ActiveBubbles--;
 			pool.GetLevelManager().CheckForNextWave();
 			pool.GetLevelManager().GetBubblesOnStage().Remove(this);
-			pool.DeSpawn(this.name);
 		}
+		else
+		{
+			transform.name = DefaultName;
+		}
+
+		pool.DeSpawn(this.name);
 	}
 }
